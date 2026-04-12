@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Books Project</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
-
-<!-- ✅ PASSO 1: SDK do Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
 <style>
   :root {
@@ -25,7 +24,6 @@
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
 
   body {
@@ -64,12 +62,7 @@
     line-height: 1;
     color: var(--cream);
   }
-
-  .logo-area h1 em {
-    font-style: italic;
-    color: var(--gold);
-  }
-
+  .logo-area h1 em { font-style: italic; color: var(--gold); }
   .logo-area p {
     margin-top: 8px;
     font-family: 'DM Mono', monospace;
@@ -79,14 +72,8 @@
     color: var(--muted);
   }
 
-  .header-stats {
-    display: flex;
-    gap: 32px;
-    padding-bottom: 4px;
-  }
-
+  .header-stats { display: flex; gap: 32px; padding-bottom: 4px; }
   .stat { text-align: right; }
-
   .stat-num {
     font-family: 'Playfair Display', serif;
     font-size: 2.2rem;
@@ -94,7 +81,6 @@
     color: var(--gold);
     line-height: 1;
   }
-
   .stat-label {
     font-family: 'DM Mono', monospace;
     font-size: .65rem;
@@ -121,7 +107,6 @@
     position: relative;
     overflow: visible;
   }
-
   .search-wrap svg {
     position: absolute;
     left: 14px; top: 50%;
@@ -130,10 +115,7 @@
     pointer-events: none;
   }
 
-  input[type="text"],
-  input[type="number"],
-  textarea,
-  select {
+  input[type="text"], input[type="number"], textarea, select {
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--cream);
@@ -143,19 +125,11 @@
     transition: border-color .2s, box-shadow .2s;
     outline: none;
   }
-
-  input[type="text"]:focus,
-  input[type="number"]:focus,
-  textarea:focus,
-  select:focus {
+  input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
     border-color: var(--gold-dim);
     box-shadow: 0 0 0 3px rgba(201,168,76,.08);
   }
-
-  .search-wrap input {
-    width: 100%;
-    padding: 10px 14px 10px 40px;
-  }
+  .search-wrap input { width: 100%; padding: 10px 14px 10px 40px; }
 
   .filter-select {
     padding: 10px 16px;
@@ -182,45 +156,17 @@
     border: none;
     transition: all .2s;
   }
+  .btn-primary { background: var(--gold); color: #0e0c0a; font-weight: 400; }
+  .btn-primary:hover { background: #dbb85a; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,168,76,.3); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--gold-dim); color: var(--cream); }
+  .btn-ghost.active { border-color: var(--gold-dim); color: var(--gold); background: rgba(201,168,76,.06); }
 
-  .btn-primary {
-    background: var(--gold);
-    color: #0e0c0a;
-    font-weight: 400;
-  }
-
-  .btn-primary:hover {
-    background: #dbb85a;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(201,168,76,.3);
-  }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-  }
-
-  .btn-ghost:hover {
-    border-color: var(--gold-dim);
-    color: var(--cream);
-  }
-
-  .btn-ghost.active {
-    border-color: var(--gold-dim);
-    color: var(--gold);
-    background: rgba(201,168,76,.06);
-  }
-
-  main {
-    position: relative;
-    z-index: 1;
-    padding: 40px 48px 80px;
-  }
+  main { position: relative; z-index: 1; padding: 40px 48px 80px; }
 
   .books-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
   }
 
@@ -233,62 +179,44 @@
     transition: transform .25s, box-shadow .25s, border-color .25s;
     animation: fadeUp .4s ease both;
   }
-
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(18px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-
-  .book-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow);
-    border-color: var(--gold-dim);
-  }
+  .book-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--gold-dim); }
 
   .book-cover {
-    height: 160px;
+    height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Playfair Display', serif;
     font-size: 2.4rem;
     position: relative;
     overflow: hidden;
+    background: var(--surface);
   }
-
+  .book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .book-cover .cover-emoji {
+    font-size: 3rem;
+  }
   .book-cover::after {
     content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.5));
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,.55));
+    z-index: 2;
   }
 
-  .book-body { padding: 16px 18px 18px; }
-
-  .book-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
-    font-weight: 700;
-    line-height: 1.3;
-    color: var(--cream);
-    margin-bottom: 4px;
-  }
-
-  .book-author {
-    font-size: .9rem;
-    font-style: italic;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .book-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  .book-body { padding: 14px 16px 16px; }
+  .book-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; line-height: 1.3; color: var(--cream); margin-bottom: 4px; }
+  .book-author { font-size: .88rem; font-style: italic; color: var(--muted); margin-bottom: 12px; }
+  .book-meta { display: flex; align-items: center; justify-content: space-between; }
 
   .stars { display: flex; gap: 2px; }
-
   .star { color: var(--border); font-size: .9rem; transition: color .15s; }
   .star.lit { color: var(--gold); }
 
@@ -303,7 +231,6 @@
     padding: 3px 8px;
     border-radius: 100px;
   }
-
   .book-date {
     font-family: 'DM Mono', monospace;
     font-size: .65rem;
@@ -312,41 +239,15 @@
     padding-top: 10px;
     border-top: 1px solid var(--border);
   }
-
-  .status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 5px;
-  }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
   .status-lido .status-dot    { background: var(--green); }
   .status-lendo .status-dot   { background: var(--gold); }
   .status-quero .status-dot   { background: var(--muted); }
 
-  .empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 20px;
-  }
-
-  .empty-state .icon {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    opacity: .3;
-  }
-
-  .empty-state h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .empty-state p {
-    color: var(--muted);
-    font-size: .9rem;
-    opacity: .7;
-  }
+  .empty-state { grid-column: 1 / -1; text-align: center; padding: 80px 20px; }
+  .empty-state .icon { font-size: 4rem; margin-bottom: 20px; opacity: .3; }
+  .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--muted); margin-bottom: 8px; }
+  .empty-state p { color: var(--muted); font-size: .9rem; opacity: .7; }
 
   .overlay {
     position: fixed; inset: 0;
@@ -361,11 +262,7 @@
     transition: opacity .25s;
     backdrop-filter: blur(4px);
   }
-
-  .overlay.open {
-    opacity: 1;
-    pointer-events: all;
-  }
+  .overlay.open { opacity: 1; pointer-events: all; }
 
   .modal {
     background: var(--card);
@@ -379,37 +276,41 @@
     transform: scale(.95) translateY(20px);
     transition: transform .3s cubic-bezier(.34,1.56,.64,1);
   }
+  .overlay.open .modal { transform: scale(1) translateY(0); }
+  .modal h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 28px; color: var(--cream); }
+  .modal h2 span { color: var(--gold); font-style: italic; }
 
-  .overlay.open .modal {
-    transform: scale(1) translateY(0);
-  }
-
-  .modal h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    margin-bottom: 28px;
-    color: var(--cream);
-  }
-
-  .modal h2 span {
-    color: var(--gold);
-    font-style: italic;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  .cover-preview-wrap {
+    display: flex;
+    align-items: center;
     gap: 16px;
   }
-
-  .form-group {
+  .cover-preview-box {
+    width: 70px;
+    height: 100px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .cover-preview-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cover-preview-info {
+    font-family: 'DM Mono', monospace;
+    font-size: .62rem;
+    color: var(--muted);
+    letter-spacing: .06em;
+    line-height: 1.7;
+    margin-bottom: 8px;
   }
 
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: 1 / -1; }
-
   .form-group label {
     font-family: 'DM Mono', monospace;
     font-size: .65rem;
@@ -417,42 +318,14 @@
     text-transform: uppercase;
     color: var(--muted);
   }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    padding: 10px 14px;
-    width: 100%;
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-    font-size: .95rem;
-    line-height: 1.5;
-  }
+  .form-group input, .form-group select, .form-group textarea { padding: 10px 14px; width: 100%; }
+  .form-group textarea { resize: vertical; min-height: 80px; font-size: .95rem; line-height: 1.5; }
 
   .star-picker { display: flex; gap: 6px; }
+  .star-picker span { font-size: 1.5rem; cursor: pointer; color: var(--border); transition: color .15s, transform .15s; }
+  .star-picker span:hover, .star-picker span.active { color: var(--gold); transform: scale(1.15); }
 
-  .star-picker span {
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--border);
-    transition: color .15s, transform .15s;
-  }
-
-  .star-picker span:hover,
-  .star-picker span.active {
-    color: var(--gold);
-    transform: scale(1.15);
-  }
-
-  .emoji-picker {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
+  .emoji-picker { display: flex; gap: 8px; flex-wrap: wrap; }
   .emoji-opt {
     width: 38px; height: 38px;
     display: flex; align-items: center; justify-content: center;
@@ -462,11 +335,7 @@
     cursor: pointer;
     transition: border-color .15s, background .15s;
   }
-
-  .emoji-opt.selected {
-    border-color: var(--gold);
-    background: rgba(201,168,76,.1);
-  }
+  .emoji-opt.selected { border-color: var(--gold); background: rgba(201,168,76,.1); }
 
   .modal-actions {
     display: flex;
@@ -486,7 +355,6 @@
     transition: opacity .3s;
     backdrop-filter: blur(3px);
   }
-
   .detail-overlay.open { opacity: 1; pointer-events: all; }
 
   .detail-panel {
@@ -501,125 +369,92 @@
     transform: translateX(100%);
     transition: transform .35s cubic-bezier(.22,1,.36,1);
   }
-
-  .detail-overlay.open .detail-panel {
-    transform: translateX(0);
-  }
+  .detail-overlay.open .detail-panel { transform: translateX(0); }
 
   .detail-cover {
     width: 100%;
-    height: 200px;
+    height: 260px;
     border-radius: 10px;
     margin-bottom: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 4rem;
+    font-size: 5rem;
     border: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--card);
   }
+  .detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  .detail-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.7rem;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 6px;
-  }
-
-  .detail-author {
-    font-size: 1rem;
-    font-style: italic;
-    color: var(--muted);
-    margin-bottom: 20px;
-  }
-
-  .detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: .95rem;
-  }
-
-  .detail-row .key {
-    font-family: 'DM Mono', monospace;
-    font-size: .65rem;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
+  .detail-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
+  .detail-author { font-size: 1rem; font-style: italic; color: var(--muted); margin-bottom: 20px; }
+  .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: .95rem; }
+  .detail-row .key { font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
   .detail-note {
-    margin-top: 20px;
-    padding: 16px;
+    margin-top: 20px; padding: 16px;
     background: rgba(255,255,255,.03);
     border-radius: 8px;
     border: 1px solid var(--border);
-    font-size: .95rem;
-    line-height: 1.6;
-    color: var(--cream);
-    font-style: italic;
+    font-size: .95rem; line-height: 1.6; color: var(--cream); font-style: italic;
   }
-
   .detail-note::before {
     content: '"';
     font-family: 'Playfair Display', serif;
-    font-size: 3rem;
-    color: var(--gold-dim);
-    line-height: .8;
-    display: block;
-    margin-bottom: 4px;
+    font-size: 3rem; color: var(--gold-dim);
+    line-height: .8; display: block; margin-bottom: 4px;
   }
-
-  .detail-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 28px;
-  }
+  .detail-actions { display: flex; gap: 10px; margin-top: 28px; }
 
   .btn-danger {
     background: transparent;
     border: 1px solid var(--red);
     color: var(--red);
     font-family: 'DM Mono', monospace;
-    font-size: .75rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    padding: 9px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all .2s;
+    font-size: .75rem; letter-spacing: .08em; text-transform: uppercase;
+    padding: 9px 18px; border-radius: 6px; cursor: pointer; transition: all .2s;
   }
-
   .btn-danger:hover { background: rgba(168,64,64,.12); }
 
   .close-btn {
-    position: absolute;
-    top: 20px; right: 20px;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1.4rem;
-    cursor: pointer;
-    line-height: 1;
-    padding: 4px;
-    transition: color .15s;
+    position: absolute; top: 20px; right: 20px;
+    background: none; border: none;
+    color: var(--muted); font-size: 1.4rem;
+    cursor: pointer; line-height: 1; padding: 4px; transition: color .15s;
   }
-
   .close-btn:hover { color: var(--cream); }
 
-  /* Loading state */
   .loading-state {
     grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 20px;
+    text-align: center; padding: 80px 20px;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: .75rem;
-    letter-spacing: .1em;
-    text-transform: uppercase;
+    font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
   }
+
+  .stats-modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 860px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 36px;
+    transform: scale(.95) translateY(20px);
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .overlay.open .stats-modal { transform: scale(1) translateY(0); }
+
+  .stats-summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+  .stats-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .stats-card-label { font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .stats-card-value { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 700; color: var(--cream); line-height: 1; }
+  .stats-charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .stats-chart-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .stats-chart-title { font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .stats-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .06em; color: var(--muted); }
+  .stats-legend-item { display: flex; align-items: center; gap: 5px; }
+  .stats-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -631,6 +466,8 @@
     .form-grid { grid-template-columns: 1fr; }
     .form-group.full { grid-column: 1; }
     .header-stats { gap: 20px; }
+    .stats-summary-grid { grid-template-columns: repeat(2,1fr); }
+    .stats-charts-row { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -642,18 +479,9 @@
     <p>Registro pessoal de leituras</p>
   </div>
   <div class="header-stats">
-    <div class="stat">
-      <div class="stat-num" id="stat-lidos">0</div>
-      <div class="stat-label">Lidos</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" id="stat-lendo">0</div>
-      <div class="stat-label">Lendo</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" id="stat-total">0</div>
-      <div class="stat-label">Total</div>
-    </div>
+    <div class="stat"><div class="stat-num" id="stat-lidos">0</div><div class="stat-label">Lidos</div></div>
+    <div class="stat"><div class="stat-num" id="stat-lendo">0</div><div class="stat-label">Lendo</div></div>
+    <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
   </div>
 </header>
 
@@ -664,33 +492,26 @@
     </svg>
     <input type="text" id="search-input" placeholder="SEARCH MY BOOKS">
   </div>
-
   <div class="search-wrap">
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-      <circle cx="11" cy="11" r="8"/>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
     <input type="text" id="search-api-input" placeholder="SEARCH ONLINE BOOKS (Open Library API)">
   </div>
   <button class="btn btn-ghost" id="clear-api-search" style="display:none;">Limpar</button>
-
   <select class="filter-select" id="filter-status">
     <option value="">Todos os status</option>
     <option value="lido">Lidos</option>
     <option value="lendo">Lendo</option>
     <option value="quero-ler">Quero ler</option>
   </select>
-
   <select class="filter-select" id="filter-genre">
     <option value="">Todos os gêneros</option>
   </select>
-
   <button class="btn btn-ghost active" id="view-grid" title="Grade">⊞</button>
   <button class="btn btn-ghost" id="view-list" title="Lista">☰</button>
-
-  <button class="btn btn-primary" id="btn-add">
-    <span>+</span> Adicionar Livro
-  </button>
+  <button class="btn btn-ghost" id="btn-stats">📊 Stats</button>
+  <button class="btn btn-primary" id="btn-add"><span>+</span> Adicionar Livro</button>
 </div>
 
 <main>
@@ -699,7 +520,7 @@
   </div>
 </main>
 
-<!-- ADD/EDIT MODAL -->
+<!-- MODAL ADD/EDIT -->
 <div class="overlay" id="modal-overlay">
   <div class="modal">
     <h2 id="modal-title">Adicionar <span>Livro</span></h2>
@@ -736,18 +557,29 @@
         <label>Data de leitura</label>
         <input type="text" id="f-date" placeholder="Ex: Jan 2024">
       </div>
+
+      <!-- CAPA -->
       <div class="form-group full">
-        <label>Ícone da capa</label>
+        <label>Capa (Google Books)</label>
+        <div class="cover-preview-wrap">
+          <div class="cover-preview-box" id="cover-preview-box">📚</div>
+          <div>
+            <div class="cover-preview-info" id="cover-preview-info">Preencha o título e clique em buscar</div>
+            <button type="button" class="btn btn-ghost" id="btn-fetch-cover" style="padding:7px 14px;font-size:.65rem;margin-top:4px;">🔍 Buscar capa</button>
+          </div>
+        </div>
+        <input type="hidden" id="f-cover">
+      </div>
+
+      <div class="form-group full">
+        <label>Emoji (fallback se não achar capa)</label>
         <div class="emoji-picker" id="emoji-picker"></div>
       </div>
       <div class="form-group full">
         <label>Avaliação</label>
         <div class="star-picker" id="star-picker">
-          <span data-v="1">★</span>
-          <span data-v="2">★</span>
-          <span data-v="3">★</span>
-          <span data-v="4">★</span>
-          <span data-v="5">★</span>
+          <span data-v="1">★</span><span data-v="2">★</span>
+          <span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
         </div>
       </div>
       <div class="form-group full">
@@ -783,18 +615,52 @@
   </div>
 </div>
 
+<!-- STATS MODAL -->
+<div class="overlay" id="stats-overlay">
+  <div class="stats-modal">
+    <h2>Suas <span>Estatísticas</span></h2>
+    <div class="stats-summary-grid">
+      <div class="stats-card"><div class="stats-card-label">Total de livros</div><div class="stats-card-value" id="st-total">0</div></div>
+      <div class="stats-card"><div class="stats-card-label">Lidos</div><div class="stats-card-value" id="st-lidos" style="color:var(--green)">0</div></div>
+      <div class="stats-card"><div class="stats-card-label">Páginas lidas</div><div class="stats-card-value" id="st-pages" style="color:var(--gold)">0</div></div>
+      <div class="stats-card"><div class="stats-card-label">Média de avaliação</div><div class="stats-card-value" id="st-rating" style="color:var(--gold)">—</div></div>
+    </div>
+    <div class="stats-charts-row">
+      <div class="stats-chart-box">
+        <div class="stats-chart-title">Livros por gênero</div>
+        <div style="position:relative;height:200px;"><canvas id="ch-genre" role="img" aria-label="Livros por gênero"></canvas></div>
+        <div class="stats-legend" id="ch-genre-legend"></div>
+      </div>
+      <div class="stats-chart-box">
+        <div class="stats-chart-title">Status de leitura</div>
+        <div style="position:relative;height:200px;"><canvas id="ch-status" role="img" aria-label="Status de leitura"></canvas></div>
+        <div class="stats-legend" id="ch-status-legend"></div>
+      </div>
+    </div>
+    <div class="stats-charts-row">
+      <div class="stats-chart-box">
+        <div class="stats-chart-title">Autores mais lidos</div>
+        <div id="ch-author-wrap" style="position:relative;height:220px;">
+          <canvas id="ch-author" role="img" aria-label="Autores mais lidos"></canvas>
+        </div>
+      </div>
+      <div class="stats-chart-box">
+        <div class="stats-chart-title">Distribuição de avaliações</div>
+        <div style="position:relative;height:220px;"><canvas id="ch-rating" role="img" aria-label="Avaliações"></canvas></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btn-stats-close">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ════════════════════════════════════════════════
-// ✅ CONFIGURAÇÃO DO SUPABASE
-// Troque os dois valores abaixo pelas suas credenciais
-// Supabase → Settings → API
-// ════════════════════════════════════════════════
 const SUPABASE_URL = 'https://mpdhqcednqsrtgylgwsw.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZGhxY2VkbnFzcnRneWxnd3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MTg1OTEsImV4cCI6MjA4ODk5NDU5MX0.v5ROHo4P0Mh-JPPJwal59D44lZuVVtbAGo7BkRsO-LU';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── CONSTANTES (inalteradas) ──
-const EMOJIS = ['📚','📖','🏰','🌍','🧙','🚀','🔮','🌊','🦅','🌙','🗡️','🌺','🦋','🎭','🎨','⚔️','🕵️','💫','🌿','🏔️'];
+const EMOJIS = ['📚'];
 const PALETTES = [
   'linear-gradient(135deg,#1a0f2e,#2d1b4e)',
   'linear-gradient(135deg,#0f1a1a,#1a3a2e)',
@@ -803,119 +669,161 @@ const PALETTES = [
   'linear-gradient(135deg,#1a1a0f,#2e2a12)',
   'linear-gradient(135deg,#1a0a0f,#3a1525)',
 ];
+const STAT_COLORS = ['#c9a84c','#3d7a5a','#5b8fcc','#a84040','#8854a0','#cc7a3a','#3a8a7a','#cc5588'];
 
-// ── ESTADO ──
 let books = [];
 let editingId = null;
 let detailId  = null;
-let selectedEmoji = '📚';
+let selectedEmoji  = '📚';
 let selectedRating = 0;
+let currentCoverUrl = '';
+let statsCharts = {};
 
-// ════════════════════════════════════════════════
-// ✅ FUNÇÕES DE BANCO (substituem localStorage)
-// ════════════════════════════════════════════════
+// ── GOOGLE BOOKS ──
+async function fetchCover(title, author) {
+  if (!title) return null;
+  const q = encodeURIComponent(author ? title + ' ' + author : title);
+  try {
+    const res  = await fetch('https://www.googleapis.com/books/v1/volumes?q=' + q + '&maxResults=5&fields=items(volumeInfo(imageLinks))');
+    const data = await res.json();
+    for (const item of (data.items || [])) {
+      const links = item.volumeInfo && item.volumeInfo.imageLinks;
+      const url = links && (links.extraLarge || links.large || links.medium || links.thumbnail);
+      if (url) return url.replace('http://', 'https://');
+    }
+  } catch(e) { console.warn('Google Books:', e); }
+  return null;
+}
 
-// Carrega todos os livros do Supabase
+function setCoverPreview(url, emoji) {
+  const box  = document.getElementById('cover-preview-box');
+  const info = document.getElementById('cover-preview-info');
+  currentCoverUrl = url || '';
+  document.getElementById('f-cover').value = currentCoverUrl;
+  if (url) {
+    box.innerHTML = '<img src="' + url + '" alt="capa">';
+    info.textContent = 'Capa encontrada ✔';
+  } else {
+    box.textContent = emoji || '📚';
+    info.textContent = 'Sem capa — será usado o emoji';
+  }
+}
+
+document.getElementById('btn-fetch-cover').addEventListener('click', async function() {
+  const title  = document.getElementById('f-title').value.trim();
+  const author = document.getElementById('f-author').value.trim();
+  if (!title) { alert('Preencha o título primeiro.'); return; }
+  this.textContent = 'Buscando...';
+  this.disabled = true;
+  const url = await fetchCover(title, author);
+  setCoverPreview(url, selectedEmoji);
+  this.textContent = '🔍 Buscar capa';
+  this.disabled = false;
+});
+
+// ── BANCO ──
 async function loadBooks() {
-  const { data, error } = await db
-    .from('books')
-    .select('*')
-    .order('created_at', { ascending: false });
-
+  const { data, error } = await db.from('books').select('*').order('created_at', { ascending: false });
   if (error) {
-    console.error('Erro ao carregar:', error.message);
     document.getElementById('books-grid').innerHTML =
-      `<div class="empty-state"><div class="icon">⚠️</div><h3>Erro ao carregar</h3><p>${error.message}</p></div>`;
+      '<div class="empty-state"><div class="icon">⚠️</div><h3>Erro ao carregar</h3><p>' + error.message + '</p></div>';
     return;
   }
   books = data;
   render();
 }
 
-// ── RENDER (inalterado) ──
+// ── RENDER ──
 function render() {
-  const q    = document.getElementById('search-input').value.toLowerCase();
-  const fSt  = document.getElementById('filter-status').value;
-  const fGn  = document.getElementById('filter-genre').value;
+  const q   = document.getElementById('search-input').value.toLowerCase();
+  const fSt = document.getElementById('filter-status').value;
+  const fGn = document.getElementById('filter-genre').value;
   const grid = document.getElementById('books-grid');
 
-  let list = books.filter(b => {
-    const matchQ  = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
-    const matchSt = !fSt || b.status === fSt;
-    const matchGn = !fGn || b.genre.toLowerCase() === fGn.toLowerCase();
+  const list = books.filter(function(b) {
+    var matchQ  = !q || b.title.toLowerCase().includes(q) || (b.author||'').toLowerCase().includes(q);
+    var matchSt = !fSt || b.status === fSt;
+    var matchGn = !fGn || (b.genre||'').toLowerCase() === fGn.toLowerCase();
     return matchQ && matchSt && matchGn;
   });
 
   grid.innerHTML = '';
 
   if (list.length === 0) {
-    grid.innerHTML = `<div class="empty-state">
-      <div class="icon">📚</div>
-      <h3>Nenhum livro encontrado</h3>
-      <p>Adicione seu primeiro livro usando o botão acima</p>
-    </div>`;
+    grid.innerHTML = '<div class="empty-state"><div class="icon">📚</div><h3>Nenhum livro encontrado</h3><p>Adicione seu primeiro livro usando o botão acima</p></div>';
   } else {
-    list.forEach((b, i) => {
-      const card = document.createElement('div');
+    list.forEach(function(b, i) {
+      var card = document.createElement('div');
       card.className = 'book-card';
       card.style.animationDelay = (i * 0.04) + 's';
 
-      const pal = PALETTES[(books.indexOf(b)) % PALETTES.length];
-      const stars = '★'.repeat(b.rating || 0) + '☆'.repeat(5 - (b.rating||0));
-      const statusMap = { lido: 'Lido', lendo: 'Lendo', 'quero-ler': 'Quero ler' };
+      var pal = PALETTES[books.indexOf(b) % PALETTES.length];
+      var statusMap = { lido:'Lido', lendo:'Lendo', 'quero-ler':'Quero ler' };
 
-      card.innerHTML = `
-        <div class="book-cover" style="background:${pal}">${b.emoji || '📚'}</div>
-        <div class="book-body">
-          <div class="book-title">${esc(b.title)}</div>
-          <div class="book-author">${esc(b.author)}</div>
-          <div class="book-meta">
-            <div class="stars">${[...stars].map((s,j) => `<span class="star ${j < (b.rating||0) ? 'lit' : ''}">${s}</span>`).join('')}</div>
-            ${b.genre ? `<span class="book-genre">${esc(b.genre)}</span>` : ''}
-          </div>
-          <div class="book-date status-${b.status}">
-            <span class="status-dot"></span>${statusMap[b.status]||''} ${b.date ? '· '+esc(b.date) : ''}
-          </div>
-        </div>`;
+      var coverHTML = b.cover
+        ? '<img src="' + esc(b.cover) + '" alt="capa" loading="lazy" onerror="this.parentElement.style.background=\'' + pal + '\';this.remove()">'
+        : '<div style="width:100%;height:100%;background:' + pal + ';display:flex;align-items:center;justify-content:center;"><span class="cover-emoji">' + (b.emoji||'📚') + '</span></div>';
 
-      card.addEventListener('click', () => openDetail(b.id));
+      var starsHtml = '';
+      for (var s = 0; s < 5; s++) {
+        starsHtml += '<span class="star ' + (s < (b.rating||0) ? 'lit' : '') + '">' + (s < (b.rating||0) ? '★' : '☆') + '</span>';
+      }
+
+      card.innerHTML =
+        '<div class="book-cover">' + coverHTML + '</div>' +
+        '<div class="book-body">' +
+          '<div class="book-title">' + esc(b.title) + '</div>' +
+          '<div class="book-author">' + esc(b.author||'') + '</div>' +
+          '<div class="book-meta">' +
+            '<div class="stars">' + starsHtml + '</div>' +
+            (b.genre ? '<span class="book-genre">' + esc(b.genre) + '</span>' : '') +
+          '</div>' +
+          '<div class="book-date status-' + b.status + '">' +
+            '<span class="status-dot"></span>' + (statusMap[b.status]||'') + (b.date ? ' · ' + esc(b.date) : '') +
+          '</div>' +
+        '</div>';
+
+      card.addEventListener('click', function() { openDetail(b.id); });
       grid.appendChild(card);
     });
   }
 
-  document.getElementById('stat-lidos').textContent = books.filter(b=>b.status==='lido').length;
-  document.getElementById('stat-lendo').textContent = books.filter(b=>b.status==='lendo').length;
+  document.getElementById('stat-lidos').textContent = books.filter(function(b){return b.status==='lido';}).length;
+  document.getElementById('stat-lendo').textContent = books.filter(function(b){return b.status==='lendo';}).length;
   document.getElementById('stat-total').textContent = books.length;
 
-  const genres = [...new Set(books.map(b=>b.genre).filter(Boolean))];
-  const fgEl = document.getElementById('filter-genre');
-  const cur = fgEl.value;
+  var genres = [];
+  books.forEach(function(b){ if(b.genre && genres.indexOf(b.genre)===-1) genres.push(b.genre); });
+  var fgEl = document.getElementById('filter-genre');
+  var cur = fgEl.value;
   fgEl.innerHTML = '<option value="">Todos os gêneros</option>' +
-    genres.map(g=>`<option value="${esc(g)}" ${g===cur?'selected':''}>${esc(g)}</option>`).join('');
+    genres.map(function(g){ return '<option value="' + esc(g) + '"' + (g===cur?' selected':'') + '>' + esc(g) + '</option>'; }).join('');
 }
 
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── MODAL (inalterado) ──
-function openModal(id = null) {
-  editingId = id;
-  const b = id ? books.find(x=>x.id===id) : null;
+// ── MODAL ──
+function openModal(id) {
+  editingId = id || null;
+  var b = id ? books.find(function(x){return x.id===id;}) : null;
 
   document.getElementById('modal-title').innerHTML = id ? 'Editar <span>Livro</span>' : 'Adicionar <span>Livro</span>';
-  document.getElementById('f-title').value  = b?.title  || '';
-  document.getElementById('f-author').value = b?.author || '';
-  document.getElementById('f-year').value   = b?.year   || '';
-  document.getElementById('f-genre').value  = b?.genre  || '';
-  document.getElementById('f-status').value = b?.status || 'lido';
-  document.getElementById('f-pages').value  = b?.pages  || '';
-  document.getElementById('f-date').value   = b?.date   || '';
-  document.getElementById('f-notes').value  = b?.notes  || '';
+  document.getElementById('f-title').value  = b ? (b.title||'')  : '';
+  document.getElementById('f-author').value = b ? (b.author||'') : '';
+  document.getElementById('f-year').value   = b ? (b.year||'')   : '';
+  document.getElementById('f-genre').value  = b ? (b.genre||'')  : '';
+  document.getElementById('f-status').value = b ? (b.status||'lido') : 'lido';
+  document.getElementById('f-pages').value  = b ? (b.pages||'')  : '';
+  document.getElementById('f-date').value   = b ? (b.date||'')   : '';
+  document.getElementById('f-notes').value  = b ? (b.notes||'')  : '';
 
-  selectedEmoji  = b?.emoji  || '📚';
-  selectedRating = b?.rating || 0;
+  selectedEmoji   = b ? (b.emoji||'📚')  : '📚';
+  selectedRating  = b ? (b.rating||0)    : 0;
+  currentCoverUrl = b ? (b.cover||'')    : '';
 
+  setCoverPreview(currentCoverUrl, selectedEmoji);
   buildEmojiPicker();
   buildStarPicker();
 
@@ -928,18 +836,22 @@ function closeModal() {
   editingId = null;
 }
 
-// ✅ saveBook agora salva no Supabase (upsert = insert ou update automático)
 async function saveBook() {
-  const title = document.getElementById('f-title').value.trim();
+  var title = document.getElementById('f-title').value.trim();
   if (!title) { document.getElementById('f-title').focus(); return; }
 
-  const btn = document.getElementById('btn-save');
+  var btn = document.getElementById('btn-save');
   btn.textContent = 'Salvando...';
   btn.disabled = true;
 
-  const book = {
+  var cover = document.getElementById('f-cover').value || currentCoverUrl;
+  if (!cover) {
+    cover = await fetchCover(title, document.getElementById('f-author').value.trim()) || '';
+  }
+
+  var book = {
     id:     editingId || Date.now().toString(36),
-    title,
+    title:  title,
     author: document.getElementById('f-author').value.trim(),
     year:   document.getElementById('f-year').value.trim(),
     genre:  document.getElementById('f-genre').value.trim(),
@@ -949,79 +861,78 @@ async function saveBook() {
     notes:  document.getElementById('f-notes').value.trim(),
     emoji:  selectedEmoji,
     rating: selectedRating,
+    cover:  cover,
   };
 
-  const { error } = await db.from('books').upsert(book);
-
+  var result = await db.from('books').upsert(book);
   btn.textContent = 'Salvar';
   btn.disabled = false;
 
-  if (error) {
-    alert('Erro ao salvar: ' + error.message);
-    return;
-  }
-
+  if (result.error) { alert('Erro ao salvar: ' + result.error.message); return; }
   closeModal();
   await loadBooks();
 }
 
-// ── EMOJI PICKER (inalterado) ──
 function buildEmojiPicker() {
-  const wrap = document.getElementById('emoji-picker');
-  wrap.innerHTML = EMOJIS.map(e =>
-    `<div class="emoji-opt ${e===selectedEmoji?'selected':''}" data-e="${e}">${e}</div>`
-  ).join('');
-  wrap.querySelectorAll('.emoji-opt').forEach(el => {
-    el.addEventListener('click', () => {
+  var wrap = document.getElementById('emoji-picker');
+  wrap.innerHTML = EMOJIS.map(function(e) {
+    return '<div class="emoji-opt ' + (e===selectedEmoji?'selected':'') + '" data-e="' + e + '">' + e + '</div>';
+  }).join('');
+  wrap.querySelectorAll('.emoji-opt').forEach(function(el) {
+    el.addEventListener('click', function() {
       selectedEmoji = el.dataset.e;
-      wrap.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('selected'));
+      wrap.querySelectorAll('.emoji-opt').forEach(function(x){x.classList.remove('selected');});
       el.classList.add('selected');
+      if (!currentCoverUrl) setCoverPreview('', selectedEmoji);
     });
   });
 }
 
-// ── STAR PICKER (inalterado) ──
 function buildStarPicker() {
-  const wrap = document.getElementById('star-picker');
-  wrap.querySelectorAll('span').forEach((s, i) => {
+  document.getElementById('star-picker').querySelectorAll('span').forEach(function(s,i) {
     s.classList.toggle('active', i < selectedRating);
-    s.onclick = () => {
-      selectedRating = i + 1;
-      wrap.querySelectorAll('span').forEach((x, j) => x.classList.toggle('active', j < selectedRating));
+    s.onclick = function() {
+      selectedRating = i+1;
+      document.getElementById('star-picker').querySelectorAll('span').forEach(function(x,j){x.classList.toggle('active',j<selectedRating);});
     };
   });
 }
 
-// ── DETAIL (inalterado) ──
+// ── DETAIL ──
 function openDetail(id) {
-  const b = books.find(x=>x.id===id);
+  var b = books.find(function(x){return x.id===id;});
   if (!b) return;
   detailId = id;
 
-  const pal = PALETTES[books.indexOf(b) % PALETTES.length];
-  const statusMap = { lido: '✔ Lido', lendo: '📖 Lendo', 'quero-ler': '🔖 Quero ler' };
+  var pal = PALETTES[books.indexOf(b) % PALETTES.length];
+  var coverEl = document.getElementById('d-cover');
 
-  document.getElementById('d-cover').style.background = pal;
-  document.getElementById('d-cover').textContent = b.emoji || '📚';
+  if (b.cover) {
+    coverEl.style.background = '';
+    coverEl.innerHTML = '<img src="' + esc(b.cover) + '" alt="capa" onerror="this.parentElement.style.background=\'' + pal + '\';this.parentElement.innerHTML=\'<span style=font-size:5rem>' + (b.emoji||'📚') + '</span>\'">';
+  } else {
+    coverEl.style.background = pal;
+    coverEl.innerHTML = '<span style="font-size:5rem">' + (b.emoji||'📚') + '</span>';
+  }
+
+  var statusMap = { lido:'✔ Lido', lendo:'📖 Lendo', 'quero-ler':'🔖 Quero ler' };
   document.getElementById('d-title').textContent  = b.title;
   document.getElementById('d-author').textContent = b.author || '—';
   document.getElementById('d-genre').textContent  = b.genre  || '—';
   document.getElementById('d-status').textContent = statusMap[b.status] || '—';
   document.getElementById('d-year').textContent   = b.year   || '—';
-  document.getElementById('d-pages').textContent  = b.pages ? b.pages + ' págs.' : '—';
+  document.getElementById('d-pages').textContent  = b.pages  ? b.pages+' págs.' : '—';
   document.getElementById('d-date').textContent   = b.date   || '—';
 
-  const starsEl = document.getElementById('d-stars');
-  starsEl.innerHTML = [1,2,3,4,5].map(i =>
-    `<span class="star ${i<=(b.rating||0)?'lit':''}">★</span>`).join('');
-
-  const notesEl = document.getElementById('d-notes');
-  if (b.notes) {
-    notesEl.style.display = 'block';
-    notesEl.textContent = b.notes;
-  } else {
-    notesEl.style.display = 'none';
+  var starsEl = document.getElementById('d-stars');
+  starsEl.innerHTML = '';
+  for (var i=1;i<=5;i++) {
+    starsEl.innerHTML += '<span class="star ' + (i<=(b.rating||0)?'lit':'') + '">★</span>';
   }
+
+  var notesEl = document.getElementById('d-notes');
+  if (b.notes) { notesEl.style.display='block'; notesEl.textContent=b.notes; }
+  else notesEl.style.display='none';
 
   document.getElementById('detail-overlay').classList.add('open');
 }
@@ -1031,152 +942,232 @@ function closeDetail() {
   detailId = null;
 }
 
-// ── EVENTS ──
-document.getElementById('btn-add').addEventListener('click', () => openModal());
+// ── STATS ──
+function destroyChart(key) {
+  if (statsCharts[key]) { statsCharts[key].destroy(); delete statsCharts[key]; }
+}
+function buildLegend(containerId, labels) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = labels.map(function(l,i){
+    return '<div class="stats-legend-item"><div class="stats-legend-dot" style="background:' + STAT_COLORS[i%STAT_COLORS.length] + '"></div>' + l + '</div>';
+  }).join('');
+}
+
+function buildStatsCharts() {
+  var total      = books.length;
+  var lidos      = books.filter(function(b){return b.status==='lido';}).length;
+  var totalPages = books.reduce(function(s,b){return s+(parseInt(b.pages)||0);},0);
+  var rated      = books.filter(function(b){return b.rating>0;});
+  var avg        = rated.length ? (rated.reduce(function(s,b){return s+b.rating;},0)/rated.length).toFixed(1) : '—';
+
+  document.getElementById('st-total').textContent  = total;
+  document.getElementById('st-lidos').textContent  = lidos;
+  document.getElementById('st-pages').textContent  = totalPages.toLocaleString('pt-BR');
+  document.getElementById('st-rating').textContent = avg!=='—' ? avg+' ★' : '—';
+
+  var genreMap = {};
+  books.forEach(function(b){ if(b.genre) genreMap[b.genre]=(genreMap[b.genre]||0)+1; });
+  var genreEntries = Object.entries(genreMap).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  var gLabels = genreEntries.map(function(e){return e[0];});
+  var gData   = genreEntries.map(function(e){return e[1];});
+
+  destroyChart('genre');
+  if (gLabels.length) {
+    statsCharts['genre'] = new Chart(document.getElementById('ch-genre'),{
+      type:'doughnut',
+      data:{ labels:gLabels, datasets:[{ data:gData, backgroundColor:STAT_COLORS, borderWidth:0, hoverOffset:6 }] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
+        plugins:{ legend:{display:false}, tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+ctx.parsed;}}} } }
+    });
+    buildLegend('ch-genre-legend', gLabels);
+  }
+
+  var sLabels = ['Lidos','Lendo','Quero ler'];
+  var sColors = ['#3d7a5a','#c9a84c','#6b5f4a'];
+  var sData   = [
+    books.filter(function(b){return b.status==='lido';}).length,
+    books.filter(function(b){return b.status==='lendo';}).length,
+    books.filter(function(b){return b.status==='quero-ler';}).length,
+  ];
+  destroyChart('status');
+  statsCharts['status'] = new Chart(document.getElementById('ch-status'),{
+    type:'doughnut',
+    data:{ labels:sLabels, datasets:[{ data:sData, backgroundColor:sColors, borderWidth:0, hoverOffset:6 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+ctx.parsed;}}} } }
+  });
+  buildLegend('ch-status-legend', sLabels);
+
+  var authorMap = {};
+  books.forEach(function(b){ if(b.author) authorMap[b.author]=(authorMap[b.author]||0)+1; });
+  var aEntries = Object.entries(authorMap).sort(function(a,b){return b[1]-a[1];}).slice(0,7);
+  var aLabels  = aEntries.map(function(e){return e[0];});
+  var aData    = aEntries.map(function(e){return e[1];});
+  var aH = Math.max(180, aLabels.length*38+60);
+  document.getElementById('ch-author-wrap').style.height = aH+'px';
+
+  destroyChart('author');
+  if (aLabels.length) {
+    statsCharts['author'] = new Chart(document.getElementById('ch-author'),{
+      type:'bar',
+      data:{ labels:aLabels, datasets:[{ data:aData, backgroundColor:STAT_COLORS.slice(0,aData.length), borderRadius:4, borderSkipped:false }] },
+      options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ grid:{color:'rgba(255,255,255,.05)'}, ticks:{color:'#6b5f4a',font:{size:11},stepSize:1} },
+          y:{ grid:{display:false}, ticks:{color:'#e8dfc8',font:{size:11}} }
+        }
+      }
+    });
+  }
+
+  var rCount = [1,2,3,4,5].map(function(n){return books.filter(function(b){return b.rating===n;}).length;});
+  destroyChart('rating');
+  statsCharts['rating'] = new Chart(document.getElementById('ch-rating'),{
+    type:'bar',
+    data:{ labels:['1 ★','2 ★','3 ★','4 ★','5 ★'],
+      datasets:[{ data:rCount, backgroundColor:['#a84040','#cc7a3a','#c9a84c','#3d7a5a','#3d7a5a'], borderRadius:4, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:'#c9a84c',font:{size:13}} },
+        y:{ grid:{color:'rgba(255,255,255,.05)'}, ticks:{color:'#6b5f4a',font:{size:11},stepSize:1} }
+      }
+    }
+  });
+}
+
+// ── EVENTOS ──
+document.getElementById('btn-add').addEventListener('click', function(){ openModal(); });
 document.getElementById('btn-cancel').addEventListener('click', closeModal);
 document.getElementById('btn-save').addEventListener('click', saveBook);
 
-document.getElementById('modal-overlay').addEventListener('click', e => {
+document.getElementById('modal-overlay').addEventListener('click', function(e){
   if (e.target === document.getElementById('modal-overlay')) closeModal();
 });
-
-document.getElementById('detail-overlay').addEventListener('click', e => {
+document.getElementById('detail-overlay').addEventListener('click', function(e){
   if (e.target === document.getElementById('detail-overlay')) closeDetail();
 });
-
 document.getElementById('detail-close').addEventListener('click', closeDetail);
-
-document.getElementById('d-edit').addEventListener('click', () => {
-  const id = detailId;
-  closeDetail();
-  setTimeout(() => openModal(id), 10);
+document.getElementById('d-edit').addEventListener('click', function(){
+  var id = detailId; closeDetail(); setTimeout(function(){ openModal(id); }, 10);
 });
-
-// ✅ Delete agora apaga do Supabase
-document.getElementById('d-delete').addEventListener('click', async () => {
+document.getElementById('d-delete').addEventListener('click', async function(){
   if (!confirm('Remover este livro?')) return;
-
-  const { error } = await db.from('books').delete().eq('id', detailId);
-  if (error) { alert('Erro ao excluir: ' + error.message); return; }
-
-  closeDetail();
-  await loadBooks();
+  var result = await db.from('books').delete().eq('id', detailId);
+  if (result.error) { alert('Erro ao excluir: ' + result.error.message); return; }
+  closeDetail(); await loadBooks();
 });
 
 document.getElementById('search-input').addEventListener('input', render);
 document.getElementById('filter-status').addEventListener('change', render);
 document.getElementById('filter-genre').addEventListener('change', render);
 
-document.getElementById('view-grid').addEventListener('click', () => {
-  document.getElementById('books-grid').style.gridTemplateColumns = '';
+document.getElementById('view-grid').addEventListener('click', function(){
+  document.getElementById('books-grid').style.gridTemplateColumns='';
   document.getElementById('view-grid').classList.add('active');
   document.getElementById('view-list').classList.remove('active');
 });
-
-document.getElementById('view-list').addEventListener('click', () => {
-  document.getElementById('books-grid').style.gridTemplateColumns = '1fr';
+document.getElementById('view-list').addEventListener('click', function(){
+  document.getElementById('books-grid').style.gridTemplateColumns='1fr';
   document.getElementById('view-list').classList.add('active');
   document.getElementById('view-grid').classList.remove('active');
 });
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeDetail(); }
+document.getElementById('btn-stats').addEventListener('click', function(){
+  document.getElementById('stats-overlay').classList.add('open');
+  setTimeout(buildStatsCharts, 50);
+});
+document.getElementById('btn-stats-close').addEventListener('click', function(){
+  document.getElementById('stats-overlay').classList.remove('open');
+});
+document.getElementById('stats-overlay').addEventListener('click', function(e){
+  if (e.target === document.getElementById('stats-overlay'))
+    document.getElementById('stats-overlay').classList.remove('open');
 });
 
-// ── OPEN LIBRARY API (inalterado) ──
-let apiDebounce = null;
+document.addEventListener('keydown', function(e){
+  if (e.key==='Escape') {
+    closeModal(); closeDetail();
+    document.getElementById('stats-overlay').classList.remove('open');
+  }
+});
 
-const apiInput = document.getElementById('search-api-input');
-const clearBtn = document.getElementById('clear-api-search');
+// ── OPEN LIBRARY API ──
+var apiDebounce = null;
+var apiInput = document.getElementById('search-api-input');
+var clearBtn = document.getElementById('clear-api-search');
 
-const apiDropdown = document.createElement('div');
-apiDropdown.style.cssText = `
-  position: absolute; top: 100%; left: 0; right: 0;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; margin-top: 6px; z-index: 200;
-  max-height: 320px; overflow-y: auto; display: none;
-`;
-apiInput.parentElement.style.position = 'relative';
+var apiDropdown = document.createElement('div');
+apiDropdown.style.cssText = 'position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-top:6px;z-index:200;max-height:320px;overflow-y:auto;display:none;';
+apiInput.parentElement.style.position='relative';
 apiInput.parentElement.appendChild(apiDropdown);
 
-apiInput.addEventListener('input', () => {
-  const q = apiInput.value.trim();
+apiInput.addEventListener('input', function(){
+  var q = apiInput.value.trim();
   clearBtn.style.display = q ? 'inline-flex' : 'none';
-
   clearTimeout(apiDebounce);
-  if (!q) { apiDropdown.style.display = 'none'; return; }
+  if (!q) { apiDropdown.style.display='none'; return; }
+  apiDropdown.style.display='block';
+  apiDropdown.innerHTML='<div style="padding:16px;color:var(--muted);font-family:\'DM Mono\',monospace;font-size:.75rem">Buscando...</div>';
 
-  apiDropdown.style.display = 'block';
-  apiDropdown.innerHTML = `<div style="padding:16px;color:var(--muted);font-family:'DM Mono',monospace;font-size:.75rem">Buscando...</div>`;
-
-  apiDebounce = setTimeout(async () => {
+  apiDebounce = setTimeout(async function(){
     try {
-      const res  = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=10`);
-      const data = await res.json();
-
-      if (!data.docs?.length) {
-        apiDropdown.innerHTML = `<div style="padding:16px;color:var(--muted);font-family:'DM Mono',monospace;font-size:.75rem">Nenhum resultado encontrado</div>`;
+      var res  = await fetch('https://openlibrary.org/search.json?q=' + encodeURIComponent(q) + '&limit=10');
+      var data = await res.json();
+      if (!data.docs || !data.docs.length) {
+        apiDropdown.innerHTML='<div style="padding:16px;color:var(--muted);font-family:\'DM Mono\',monospace;font-size:.75rem">Nenhum resultado</div>';
         return;
       }
+      apiDropdown.innerHTML = data.docs.map(function(doc,i){
+        return '<div data-i="'+i+'" style="padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;">' +
+          '<div style="font-family:\'Playfair Display\',serif;font-size:1rem;color:var(--cream)">' + (doc.title||'—') + '</div>' +
+          '<div style="font-size:.85rem;font-style:italic;color:var(--muted);margin-top:2px">' + ((doc.author_name&&doc.author_name[0])||'Autor desconhecido') + (doc.first_publish_year?' · '+doc.first_publish_year:'') + '</div>' +
+        '</div>';
+      }).join('');
 
-      apiDropdown.innerHTML = data.docs.map((doc, i) => `
-        <div data-i="${i}" style="
-          padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border);
-          transition: background .15s;
-        ">
-          <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--cream)">${doc.title || '—'}</div>
-          <div style="font-size:.85rem;font-style:italic;color:var(--muted);margin-top:2px">${(doc.author_name?.[0]) || 'Autor desconhecido'} ${doc.first_publish_year ? '· '+doc.first_publish_year : ''}</div>
-        </div>
-      `).join('');
-
-      apiDropdown.querySelectorAll('[data-i]').forEach(el => {
-        el.addEventListener('mouseenter', () => el.style.background = 'rgba(201,168,76,.06)');
-        el.addEventListener('mouseleave', () => el.style.background = '');
-
-        el.addEventListener('click', () => {
-          const doc = data.docs[+el.dataset.i];
-
-          document.getElementById('f-title').value  = doc.title || '';
-          document.getElementById('f-author').value = doc.author_name?.[0] || '';
-          document.getElementById('f-year').value   = doc.first_publish_year || '';
-          document.getElementById('f-pages').value  = doc.number_of_pages_median || '';
-          document.getElementById('f-genre').value  = doc.subject?.[0] || '';
+      apiDropdown.querySelectorAll('[data-i]').forEach(function(el){
+        el.addEventListener('mouseenter',function(){el.style.background='rgba(201,168,76,.06)';});
+        el.addEventListener('mouseleave',function(){el.style.background='';});
+        el.addEventListener('click', async function(){
+          var doc = data.docs[+el.dataset.i];
+          document.getElementById('f-title').value  = doc.title||'';
+          document.getElementById('f-author').value = (doc.author_name&&doc.author_name[0])||'';
+          document.getElementById('f-year').value   = doc.first_publish_year||'';
+          document.getElementById('f-pages').value  = doc.number_of_pages_median||'';
+          document.getElementById('f-genre').value  = (doc.subject&&doc.subject[0])||'';
           document.getElementById('f-status').value = 'quero-ler';
-
-          selectedEmoji  = '📚';
-          selectedRating = 0;
-
-          buildEmojiPicker();
-          buildStarPicker();
-
-          apiDropdown.style.display = 'none';
-          apiInput.value = '';
-          clearBtn.style.display = 'none';
-
+          selectedEmoji='📚'; selectedRating=0; currentCoverUrl='';
+          buildEmojiPicker(); buildStarPicker();
+          setCoverPreview('','📚');
+          apiDropdown.style.display='none';
+          apiInput.value=''; clearBtn.style.display='none';
           document.getElementById('modal-overlay').classList.add('open');
           document.getElementById('f-title').focus();
+          // busca capa em paralelo
+          fetchCover(doc.title, doc.author_name&&doc.author_name[0]).then(function(url){
+            setCoverPreview(url,'📚');
+          });
         });
       });
-
-    } catch {
-      apiDropdown.innerHTML = `<div style="padding:16px;color:var(--muted);font-family:'DM Mono',monospace;font-size:.75rem">Erro ao buscar. Tente novamente.</div>`;
+    } catch(err) {
+      apiDropdown.innerHTML='<div style="padding:16px;color:var(--muted);font-family:\'DM Mono\',monospace;font-size:.75rem">Erro ao buscar.</div>';
     }
   }, 400);
 });
 
-clearBtn.addEventListener('click', () => {
-  apiInput.value = '';
-  clearBtn.style.display = 'none';
-  apiDropdown.style.display = 'none';
+clearBtn.addEventListener('click',function(){
+  apiInput.value=''; clearBtn.style.display='none'; apiDropdown.style.display='none';
+});
+document.addEventListener('mousedown',function(e){
+  if(!apiInput.parentElement.contains(e.target)) apiDropdown.style.display='none';
 });
 
-document.addEventListener('mousedown', e => {
-  if (!apiInput.parentElement.contains(e.target)) {
-    apiDropdown.style.display = 'none';
-  }
-});
+// ── IMPORTANTE: adicionar coluna 'cover' no Supabase ──
+// Rode no SQL Editor do Supabase:
+// ALTER TABLE books ADD COLUMN IF NOT EXISTS cover TEXT;
 
-// ✅ Inicia carregando do banco (substituiu o render() direto)
 loadBooks();
 </script>
 </body>

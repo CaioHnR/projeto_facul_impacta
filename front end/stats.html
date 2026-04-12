@@ -1,0 +1,67 @@
+<!-- ════════════════════════════════════════════════
+     PAINEL DE ESTATÍSTICAS — cole como stats.html
+     ou insira o <div id="stats-panel"> dentro do seu HTML
+     ════════════════════════════════════════════════ -->
+
+<!-- Adicione isso no <head> do seu HTML existente (Chart.js) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<!-- Botão para abrir o painel — adicione na sua toolbar -->
+<button class="btn btn-ghost" id="btn-stats">📊 Estatísticas</button>
+
+<!-- Overlay do painel — adicione antes do </body> -->
+<div class="overlay" id="stats-overlay">
+  <div class="modal" style="max-width: 820px; width: 95vw;">
+    <h2>Suas <span>Estatísticas</span></h2>
+
+    <!-- Cards de resumo -->
+    <div style="display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px;">
+        <div style="font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Total</div>
+        <div id="st-total" style="font-family:'Playfair Display',serif; font-size:2rem; color:var(--cream);">0</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px;">
+        <div style="font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Lidos</div>
+        <div id="st-lidos" style="font-family:'Playfair Display',serif; font-size:2rem; color:#3d7a5a;">0</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px;">
+        <div style="font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Páginas</div>
+        <div id="st-pages" style="font-family:'Playfair Display',serif; font-size:2rem; color:var(--gold);">0</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px;">
+        <div style="font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Média ★</div>
+        <div id="st-rating" style="font-family:'Playfair Display',serif; font-size:2rem; color:var(--gold);">—</div>
+      </div>
+    </div>
+
+    <!-- Gráficos linha 1 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px;">
+        <div style="font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:14px;">Por gênero</div>
+        <div style="position:relative; height:200px;"><canvas id="ch-genre" role="img" aria-label="Livros por gênero"></canvas></div>
+        <div id="ch-genre-legend" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; font-size:.75rem; color:var(--muted);"></div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px;">
+        <div style="font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:14px;">Status</div>
+        <div style="position:relative; height:200px;"><canvas id="ch-status" role="img" aria-label="Status de leitura"></canvas></div>
+        <div id="ch-status-legend" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; font-size:.75rem; color:var(--muted);"></div>
+      </div>
+    </div>
+
+    <!-- Gráficos linha 2 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px;">
+        <div style="font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:14px;">Autores mais lidos</div>
+        <div id="ch-author-wrap" style="position:relative;"><canvas id="ch-author" role="img" aria-label="Autores mais lidos"></canvas></div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px;">
+        <div style="font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:14px;">Distribuição de avaliações</div>
+        <div style="position:relative; height:200px;"><canvas id="ch-rating" role="img" aria-label="Distribuição de avaliações"></canvas></div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btn-stats-close">Fechar</button>
+    </div>
+  </div>
+</div>
