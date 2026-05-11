@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
 <style>
-  :root {
+  /* ── THEME VARIABLES ── */
+  :root[data-theme="dark"] {
     --bg:        #0e0c0a;
     --surface:   #161310;
     --card:      #1c1814;
@@ -21,6 +22,25 @@
     --red:       #a84040;
     --green:     #3d7a5a;
     --shadow:    0 8px 40px rgba(0,0,0,.6);
+    --shelf-wood:#3d2b1a;
+    --shelf-edge:#5a3e26;
+    --shelf-shadow: rgba(0,0,0,.5);
+  }
+  :root[data-theme="light"] {
+    --bg:        #f5f0e8;
+    --surface:   #ede8dc;
+    --card:      #faf7f1;
+    --border:    #d5c9b0;
+    --gold:      #a07820;
+    --gold-dim:  #c9a84c;
+    --cream:     #2c2010;
+    --muted:     #7a6a50;
+    --red:       #a84040;
+    --green:     #2d6a44;
+    --shadow:    0 8px 40px rgba(0,0,0,.15);
+    --shelf-wood:#c4a06a;
+    --shelf-edge:#a07840;
+    --shelf-shadow: rgba(0,0,0,.18);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,6 +52,7 @@
     font-family: 'Crimson Pro', Georgia, serif;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background .35s, color .35s;
   }
 
   body::before {
@@ -72,6 +93,7 @@
     color: var(--muted);
   }
 
+  .header-right { display: flex; align-items: flex-end; gap: 32px; }
   .header-stats { display: flex; gap: 32px; padding-bottom: 4px; }
   .stat { text-align: right; }
   .stat-num {
@@ -90,6 +112,78 @@
     margin-top: 4px;
   }
 
+  /* ── THEME TOGGLE ── */
+  .theme-toggle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 6px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    transition: all .2s;
+    white-space: nowrap;
+    margin-bottom: 4px;
+  }
+  .theme-toggle:hover { border-color: var(--gold-dim); color: var(--cream); }
+  .theme-icon { font-size: 1rem; transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+  [data-theme="light"] .theme-icon { transform: rotate(180deg); }
+
+  /* ── BADGES ── */
+  .badges-bar {
+    position: relative;
+    z-index: 1;
+    padding: 16px 48px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    min-height: 60px;
+  }
+  .badges-title {
+    font-family: 'DM Mono', monospace;
+    font-size: .62rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 4px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+    font-size: .68rem;
+    letter-spacing: .06em;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    transition: all .3s;
+    animation: badgePop .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes badgePop {
+    from { opacity:0; transform: scale(.6) translateY(8px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+  }
+  .badge.earned {
+    border-color: var(--gold-dim);
+    background: rgba(201,168,76,.1);
+    color: var(--gold);
+  }
+  .badge.earned .badge-icon { filter: none; }
+  .badge-icon { font-size: .9rem; }
+  .badge-locked { opacity: .35; filter: grayscale(1); }
+
+  /* ── TOOLBAR ── */
   .toolbar {
     position: relative;
     z-index: 50;
@@ -122,7 +216,7 @@
     font-family: 'Crimson Pro', serif;
     font-size: 1rem;
     border-radius: 6px;
-    transition: border-color .2s, box-shadow .2s;
+    transition: border-color .2s, box-shadow .2s, background .35s;
     outline: none;
   }
   input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
@@ -164,6 +258,7 @@
 
   main { position: relative; z-index: 1; padding: 40px 48px 80px; }
 
+  /* ── GRID VIEW ── */
   .books-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -201,9 +296,7 @@
     object-fit: cover;
     display: block;
   }
-  .book-cover .cover-emoji {
-    font-size: 3rem;
-  }
+  .book-cover .cover-emoji { font-size: 3rem; }
   .book-cover::after {
     content: '';
     position: absolute; inset: 0;
@@ -244,11 +337,128 @@
   .status-lendo .status-dot   { background: var(--gold); }
   .status-quero .status-dot   { background: var(--muted); }
 
+  /* ── BOOKSHELF VIEW ── */
+  .bookshelf-container {
+    display: none;
+  }
+  .bookshelf-container.active {
+    display: block;
+  }
+  .books-grid.shelf-hidden {
+    display: none;
+  }
+
+  .shelf-row {
+    margin-bottom: 0;
+    position: relative;
+  }
+  .shelf-books {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    padding: 20px 16px 0;
+    min-height: 210px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .shelf-plank {
+    background: linear-gradient(to bottom, var(--shelf-edge) 0%, var(--shelf-wood) 20%, var(--shelf-wood) 80%, #1a0e05 100%);
+    height: 18px;
+    border-radius: 2px;
+    box-shadow: 0 6px 18px var(--shelf-shadow);
+    position: relative;
+  }
+  [data-theme="light"] .shelf-plank {
+    background: linear-gradient(to bottom, #e8c98a 0%, var(--shelf-wood) 20%, #b08030 80%, #7a5820 100%);
+  }
+
+  .shelf-book {
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform .2s cubic-bezier(.34,1.56,.64,1);
+    flex-shrink: 0;
+  }
+  .shelf-book:hover { transform: translateY(-14px); }
+  .shelf-book:hover .shelf-book-title-tooltip { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  .shelf-book-spine {
+    width: 34px;
+    height: 160px;
+    border-radius: 2px 4px 4px 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 2px 0 6px rgba(0,0,0,.4), inset -3px 0 8px rgba(0,0,0,.2);
+  }
+  .shelf-book-spine img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center;
+  }
+  .shelf-book-spine-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-family: 'Playfair Display', serif;
+    font-size: .58rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,.7);
+    padding: 8px 4px;
+    max-height: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    text-align: center;
+  }
+  .shelf-book-spine-star {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .55rem;
+    color: var(--gold);
+    letter-spacing: -1px;
+  }
+
+  .shelf-book-title-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: .78rem;
+    color: var(--cream);
+    white-space: nowrap;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+    z-index: 10;
+    box-shadow: var(--shadow);
+  }
+
+  /* ── EMPTY / LOADING ── */
   .empty-state { grid-column: 1 / -1; text-align: center; padding: 80px 20px; }
   .empty-state .icon { font-size: 4rem; margin-bottom: 20px; opacity: .3; }
   .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--muted); margin-bottom: 8px; }
   .empty-state p { color: var(--muted); font-size: .9rem; opacity: .7; }
 
+  /* ── MODALS ── */
   .overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,.75);
@@ -280,44 +490,21 @@
   .modal h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 28px; color: var(--cream); }
   .modal h2 span { color: var(--gold); font-style: italic; }
 
-  .cover-preview-wrap {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+  .cover-preview-wrap { display: flex; align-items: center; gap: 16px; }
   .cover-preview-box {
-    width: 70px;
-    height: 100px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
+    width: 70px; height: 100px;
+    border-radius: 6px; border: 1px solid var(--border);
     background: var(--surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    flex-shrink: 0;
-    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; flex-shrink: 0; overflow: hidden;
   }
   .cover-preview-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .cover-preview-info {
-    font-family: 'DM Mono', monospace;
-    font-size: .62rem;
-    color: var(--muted);
-    letter-spacing: .06em;
-    line-height: 1.7;
-    margin-bottom: 8px;
-  }
+  .cover-preview-info { font-family: 'DM Mono', monospace; font-size: .62rem; color: var(--muted); letter-spacing: .06em; line-height: 1.7; margin-bottom: 8px; }
 
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: 1 / -1; }
-  .form-group label {
-    font-family: 'DM Mono', monospace;
-    font-size: .65rem;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
+  .form-group label { font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
   .form-group input, .form-group select, .form-group textarea { padding: 10px 14px; width: 100%; }
   .form-group textarea { resize: vertical; min-height: 80px; font-size: .95rem; line-height: 1.5; }
 
@@ -326,125 +513,49 @@
   .star-picker span:hover, .star-picker span.active { color: var(--gold); transform: scale(1.15); }
 
   .emoji-picker { display: flex; gap: 8px; flex-wrap: wrap; }
-  .emoji-opt {
-    width: 38px; height: 38px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem;
-    border-radius: 6px;
-    border: 2px solid var(--border);
-    cursor: pointer;
-    transition: border-color .15s, background .15s;
-  }
+  .emoji-opt { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border-radius: 6px; border: 2px solid var(--border); cursor: pointer; transition: border-color .15s, background .15s; }
   .emoji-opt.selected { border-color: var(--gold); background: rgba(201,168,76,.1); }
 
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); }
 
+  /* ── DETAIL PANEL ── */
   .detail-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,.6);
     z-index: 90;
-    opacity: 0;
-    pointer-events: none;
+    opacity: 0; pointer-events: none;
     transition: opacity .3s;
     backdrop-filter: blur(3px);
   }
   .detail-overlay.open { opacity: 1; pointer-events: all; }
-
   .detail-panel {
-    position: fixed;
-    top: 0; right: 0; bottom: 0;
+    position: fixed; top: 0; right: 0; bottom: 0;
     width: min(420px, 100vw);
     background: var(--surface);
     border-left: 1px solid var(--border);
-    z-index: 95;
-    padding: 40px 32px;
-    overflow-y: auto;
+    z-index: 95; padding: 40px 32px; overflow-y: auto;
     transform: translateX(100%);
     transition: transform .35s cubic-bezier(.22,1,.36,1);
   }
   .detail-overlay.open .detail-panel { transform: translateX(0); }
-
-  .detail-cover {
-    width: 100%;
-    height: 260px;
-    border-radius: 10px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 5rem;
-    border: 1px solid var(--border);
-    overflow: hidden;
-    background: var(--card);
-  }
+  .detail-cover { width: 100%; height: 260px; border-radius: 10px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; font-size: 5rem; border: 1px solid var(--border); overflow: hidden; background: var(--card); }
   .detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
   .detail-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
   .detail-author { font-size: 1rem; font-style: italic; color: var(--muted); margin-bottom: 20px; }
   .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: .95rem; }
   .detail-row .key { font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-  .detail-note {
-    margin-top: 20px; padding: 16px;
-    background: rgba(255,255,255,.03);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    font-size: .95rem; line-height: 1.6; color: var(--cream); font-style: italic;
-  }
-  .detail-note::before {
-    content: '"';
-    font-family: 'Playfair Display', serif;
-    font-size: 3rem; color: var(--gold-dim);
-    line-height: .8; display: block; margin-bottom: 4px;
-  }
+  .detail-note { margin-top: 20px; padding: 16px; background: rgba(255,255,255,.03); border-radius: 8px; border: 1px solid var(--border); font-size: .95rem; line-height: 1.6; color: var(--cream); font-style: italic; }
+  .detail-note::before { content: '"'; font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--gold-dim); line-height: .8; display: block; margin-bottom: 4px; }
   .detail-actions { display: flex; gap: 10px; margin-top: 28px; }
-
-  .btn-danger {
-    background: transparent;
-    border: 1px solid var(--red);
-    color: var(--red);
-    font-family: 'DM Mono', monospace;
-    font-size: .75rem; letter-spacing: .08em; text-transform: uppercase;
-    padding: 9px 18px; border-radius: 6px; cursor: pointer; transition: all .2s;
-  }
+  .btn-danger { background: transparent; border: 1px solid var(--red); color: var(--red); font-family: 'DM Mono', monospace; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; padding: 9px 18px; border-radius: 6px; cursor: pointer; transition: all .2s; }
   .btn-danger:hover { background: rgba(168,64,64,.12); }
-
-  .close-btn {
-    position: absolute; top: 20px; right: 20px;
-    background: none; border: none;
-    color: var(--muted); font-size: 1.4rem;
-    cursor: pointer; line-height: 1; padding: 4px; transition: color .15s;
-  }
+  .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1; padding: 4px; transition: color .15s; }
   .close-btn:hover { color: var(--cream); }
 
-  .loading-state {
-    grid-column: 1 / -1;
-    text-align: center; padding: 80px 20px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
-  }
-
-  .stats-modal {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    width: 100%;
-    max-width: 860px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 36px;
-    transform: scale(.95) translateY(20px);
-    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-  }
+  /* ── STATS ── */
+  .loading-state { grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
+  .stats-modal { background: var(--card); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 860px; max-height: 90vh; overflow-y: auto; padding: 36px; transform: scale(.95) translateY(20px); transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
   .overlay.open .stats-modal { transform: scale(1) translateY(0); }
-
   .stats-summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
   .stats-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
   .stats-card-label { font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
@@ -462,7 +573,7 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
 
   @media (max-width: 640px) {
-    header, .toolbar, main { padding-left: 20px; padding-right: 20px; }
+    header, .toolbar, main, .badges-bar { padding-left: 20px; padding-right: 20px; }
     .form-grid { grid-template-columns: 1fr; }
     .form-group.full { grid-column: 1; }
     .header-stats { gap: 20px; }
@@ -478,12 +589,24 @@
     <h1>Minha <em>Biblioteca</em></h1>
     <p>Registro pessoal de leituras</p>
   </div>
-  <div class="header-stats">
-    <div class="stat"><div class="stat-num" id="stat-lidos">0</div><div class="stat-label">Lidos</div></div>
-    <div class="stat"><div class="stat-num" id="stat-lendo">0</div><div class="stat-label">Lendo</div></div>
-    <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
+  <div class="header-right">
+    <div class="header-stats">
+      <div class="stat"><div class="stat-num" id="stat-lidos">0</div><div class="stat-label">Lidos</div></div>
+      <div class="stat"><div class="stat-num" id="stat-lendo">0</div><div class="stat-label">Lendo</div></div>
+      <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
+    </div>
+    <button class="theme-toggle" id="theme-toggle" title="Alternar tema">
+      <span class="theme-icon">🌙</span>
+      <span id="theme-label">Dark</span>
+    </button>
   </div>
 </header>
+
+<!-- BADGES BAR -->
+<div class="badges-bar" id="badges-bar">
+  <span class="badges-title">Conquistas</span>
+  <!-- populated by JS -->
+</div>
 
 <div class="toolbar">
   <div class="search-wrap">
@@ -510,6 +633,7 @@
   </select>
   <button class="btn btn-ghost active" id="view-grid" title="Grade">⊞</button>
   <button class="btn btn-ghost" id="view-list" title="Lista">☰</button>
+  <button class="btn btn-ghost" id="view-shelf" title="Estante">🗂</button>
   <button class="btn btn-ghost" id="btn-stats">📊 Stats</button>
   <button class="btn btn-primary" id="btn-add"><span>+</span> Adicionar Livro</button>
 </div>
@@ -518,6 +642,8 @@
   <div class="books-grid" id="books-grid">
     <div class="loading-state">Carregando biblioteca...</div>
   </div>
+  <!-- BOOKSHELF -->
+  <div class="bookshelf-container" id="bookshelf-container"></div>
 </main>
 
 <!-- MODAL ADD/EDIT -->
@@ -557,8 +683,6 @@
         <label>Data de leitura</label>
         <input type="text" id="f-date" placeholder="Ex: Jan 2024">
       </div>
-
-      <!-- CAPA -->
       <div class="form-group full">
         <label>Capa (Google Books)</label>
         <div class="cover-preview-wrap">
@@ -570,7 +694,6 @@
         </div>
         <input type="hidden" id="f-cover">
       </div>
-
       <div class="form-group full">
         <label>Emoji (fallback se não achar capa)</label>
         <div class="emoji-picker" id="emoji-picker"></div>
@@ -669,6 +792,10 @@ const PALETTES = [
   'linear-gradient(135deg,#1a1a0f,#2e2a12)',
   'linear-gradient(135deg,#1a0a0f,#3a1525)',
 ];
+const SPINE_COLORS = [
+  '#2d1b4e','#1a3a2e','#3a1f1a','#1a1a3a','#2e2a12',
+  '#3a1525','#1a2a3a','#2a1a0f','#0f2a2a','#2a0f1a'
+];
 const STAT_COLORS = ['#c9a84c','#3d7a5a','#5b8fcc','#a84040','#8854a0','#cc7a3a','#3a8a7a','#cc5588'];
 
 let books = [];
@@ -678,17 +805,118 @@ let selectedEmoji  = '📚';
 let selectedRating = 0;
 let currentCoverUrl = '';
 let statsCharts = {};
+let currentView = 'grid'; // 'grid' | 'list' | 'shelf'
+
+// ── THEME TOGGLE ──
+(function() {
+  var saved = localStorage.getItem('lib-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeBtn(saved);
+})();
+
+function updateThemeBtn(theme) {
+  var icon  = document.querySelector('.theme-icon');
+  var label = document.getElementById('theme-label');
+  if (theme === 'dark') { icon.textContent = '🌙'; label.textContent = 'Dark'; }
+  else                  { icon.textContent = '☀️'; label.textContent = 'Light'; }
+}
+
+document.getElementById('theme-toggle').addEventListener('click', function() {
+  var current = document.documentElement.getAttribute('data-theme');
+  var next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('lib-theme', next);
+  updateThemeBtn(next);
+});
+
+// ── BADGES DEFINITION ──
+var BADGE_DEFS = [
+  {
+    id: 'first',
+    icon: '📖',
+    label: 'Primeiro livro',
+    desc: 'Adicionou o primeiro livro',
+    check: function(b) { return b.length >= 1; }
+  },
+  {
+    id: 'five',
+    icon: '🔥',
+    label: '5 livros lidos',
+    desc: 'Leu pelo menos 5 livros',
+    check: function(b) { return b.filter(function(x){return x.status==='lido';}).length >= 5; }
+  },
+  {
+    id: 'ten',
+    icon: '🏆',
+    label: '10 livros lidos',
+    desc: 'Leu pelo menos 10 livros',
+    check: function(b) { return b.filter(function(x){return x.status==='lido';}).length >= 10; }
+  },
+  {
+    id: 'critic',
+    icon: '⭐',
+    label: 'Crítico literário',
+    desc: 'Avaliou 3 ou mais livros com 5 estrelas',
+    check: function(b) { return b.filter(function(x){return x.rating===5;}).length >= 3; }
+  },
+  {
+    id: 'genres',
+    icon: '🌍',
+    label: 'Eclético',
+    desc: 'Leu livros de 3 gêneros diferentes',
+    check: function(b) {
+      var gs = {};
+      b.filter(function(x){return x.status==='lido'&&x.genre;}).forEach(function(x){gs[x.genre.toLowerCase()]=1;});
+      return Object.keys(gs).length >= 3;
+    }
+  },
+  {
+    id: 'pages',
+    icon: '📜',
+    label: 'Maratonista',
+    desc: 'Mais de 1000 páginas lidas no total',
+    check: function(b) { return b.filter(function(x){return x.status==='lido';}).reduce(function(s,x){return s+(parseInt(x.pages)||0);},0) >= 1000; }
+  },
+  {
+    id: 'notes',
+    icon: '✍️',
+    label: 'Anotador',
+    desc: 'Escreveu notas em 3 livros',
+    check: function(b) { return b.filter(function(x){return x.notes&&x.notes.trim().length>0;}).length >= 3; }
+  },
+  {
+    id: 'wishlist',
+    icon: '🔖',
+    label: 'Lista infinita',
+    desc: '5 ou mais livros na lista de desejos',
+    check: function(b) { return b.filter(function(x){return x.status==='quero-ler';}).length >= 5; }
+  }
+];
+
+function renderBadges() {
+  var bar = document.getElementById('badges-bar');
+  bar.innerHTML = '<span class="badges-title">Conquistas</span>';
+  BADGE_DEFS.forEach(function(def, i) {
+    var earned = def.check(books);
+    var el = document.createElement('div');
+    el.className = 'badge' + (earned ? ' earned' : ' badge-locked');
+    el.title = def.desc;
+    el.style.animationDelay = (i * 0.06) + 's';
+    el.innerHTML = '<span class="badge-icon">' + def.icon + '</span>' + def.label;
+    bar.appendChild(el);
+  });
+}
 
 // ── GOOGLE BOOKS ──
 async function fetchCover(title, author) {
   if (!title) return null;
-  const q = encodeURIComponent(author ? title + ' ' + author : title);
+  var q = encodeURIComponent(author ? title + ' ' + author : title);
   try {
-    const res  = await fetch('https://www.googleapis.com/books/v1/volumes?q=' + q + '&maxResults=5&fields=items(volumeInfo(imageLinks))');
-    const data = await res.json();
-    for (const item of (data.items || [])) {
-      const links = item.volumeInfo && item.volumeInfo.imageLinks;
-      const url = links && (links.extraLarge || links.large || links.medium || links.thumbnail);
+    var res  = await fetch('https://www.googleapis.com/books/v1/volumes?q=' + q + '&maxResults=5&fields=items(volumeInfo(imageLinks))');
+    var data = await res.json();
+    for (var item of (data.items || [])) {
+      var links = item.volumeInfo && item.volumeInfo.imageLinks;
+      var url = links && (links.extraLarge || links.large || links.medium || links.thumbnail);
       if (url) return url.replace('http://', 'https://');
     }
   } catch(e) { console.warn('Google Books:', e); }
@@ -696,8 +924,8 @@ async function fetchCover(title, author) {
 }
 
 function setCoverPreview(url, emoji) {
-  const box  = document.getElementById('cover-preview-box');
-  const info = document.getElementById('cover-preview-info');
+  var box  = document.getElementById('cover-preview-box');
+  var info = document.getElementById('cover-preview-info');
   currentCoverUrl = url || '';
   document.getElementById('f-cover').value = currentCoverUrl;
   if (url) {
@@ -710,12 +938,12 @@ function setCoverPreview(url, emoji) {
 }
 
 document.getElementById('btn-fetch-cover').addEventListener('click', async function() {
-  const title  = document.getElementById('f-title').value.trim();
-  const author = document.getElementById('f-author').value.trim();
+  var title  = document.getElementById('f-title').value.trim();
+  var author = document.getElementById('f-author').value.trim();
   if (!title) { alert('Preencha o título primeiro.'); return; }
   this.textContent = 'Buscando...';
   this.disabled = true;
-  const url = await fetchCover(title, author);
+  var url = await fetchCover(title, author);
   setCoverPreview(url, selectedEmoji);
   this.textContent = '🔍 Buscar capa';
   this.disabled = false;
@@ -723,7 +951,7 @@ document.getElementById('btn-fetch-cover').addEventListener('click', async funct
 
 // ── BANCO ──
 async function loadBooks() {
-  const { data, error } = await db.from('books').select('*').order('created_at', { ascending: false });
+  var { data, error } = await db.from('books').select('*').order('created_at', { ascending: false });
   if (error) {
     document.getElementById('books-grid').innerHTML =
       '<div class="empty-state"><div class="icon">⚠️</div><h3>Erro ao carregar</h3><p>' + error.message + '</p></div>';
@@ -731,61 +959,56 @@ async function loadBooks() {
   }
   books = data;
   render();
+  renderBadges();
 }
 
 // ── RENDER ──
 function render() {
-  const q   = document.getElementById('search-input').value.toLowerCase();
-  const fSt = document.getElementById('filter-status').value;
-  const fGn = document.getElementById('filter-genre').value;
-  const grid = document.getElementById('books-grid');
+  var q   = document.getElementById('search-input').value.toLowerCase();
+  var fSt = document.getElementById('filter-status').value;
+  var fGn = document.getElementById('filter-genre').value;
+  var grid = document.getElementById('books-grid');
 
-  const list = books.filter(function(b) {
+  var list = books.filter(function(b) {
     var matchQ  = !q || b.title.toLowerCase().includes(q) || (b.author||'').toLowerCase().includes(q);
     var matchSt = !fSt || b.status === fSt;
     var matchGn = !fGn || (b.genre||'').toLowerCase() === fGn.toLowerCase();
     return matchQ && matchSt && matchGn;
   });
 
-  grid.innerHTML = '';
-
-  if (list.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="icon">📚</div><h3>Nenhum livro encontrado</h3><p>Adicione seu primeiro livro usando o botão acima</p></div>';
+  if (currentView !== 'shelf') {
+    grid.innerHTML = '';
+    if (list.length === 0) {
+      grid.innerHTML = '<div class="empty-state"><div class="icon">📚</div><h3>Nenhum livro encontrado</h3><p>Adicione seu primeiro livro usando o botão acima</p></div>';
+    } else {
+      list.forEach(function(b, i) {
+        var card = document.createElement('div');
+        card.className = 'book-card';
+        card.style.animationDelay = (i * 0.04) + 's';
+        var pal = PALETTES[books.indexOf(b) % PALETTES.length];
+        var statusMap = { lido:'Lido', lendo:'Lendo', 'quero-ler':'Quero ler' };
+        var coverHTML = b.cover
+          ? '<img src="' + esc(b.cover) + '" alt="capa" loading="lazy" onerror="this.parentElement.style.background=\'' + pal + '\';this.remove()">'
+          : '<div style="width:100%;height:100%;background:' + pal + ';display:flex;align-items:center;justify-content:center;"><span class="cover-emoji">' + (b.emoji||'📚') + '</span></div>';
+        var starsHtml = '';
+        for (var s = 0; s < 5; s++) starsHtml += '<span class="star ' + (s < (b.rating||0) ? 'lit' : '') + '">' + (s < (b.rating||0) ? '★' : '☆') + '</span>';
+        card.innerHTML =
+          '<div class="book-cover">' + coverHTML + '</div>' +
+          '<div class="book-body">' +
+            '<div class="book-title">' + esc(b.title) + '</div>' +
+            '<div class="book-author">' + esc(b.author||'') + '</div>' +
+            '<div class="book-meta">' +
+              '<div class="stars">' + starsHtml + '</div>' +
+              (b.genre ? '<span class="book-genre">' + esc(b.genre) + '</span>' : '') +
+            '</div>' +
+            '<div class="book-date status-' + b.status + '"><span class="status-dot"></span>' + (statusMap[b.status]||'') + (b.date ? ' · ' + esc(b.date) : '') + '</div>' +
+          '</div>';
+        card.addEventListener('click', function() { openDetail(b.id); });
+        grid.appendChild(card);
+      });
+    }
   } else {
-    list.forEach(function(b, i) {
-      var card = document.createElement('div');
-      card.className = 'book-card';
-      card.style.animationDelay = (i * 0.04) + 's';
-
-      var pal = PALETTES[books.indexOf(b) % PALETTES.length];
-      var statusMap = { lido:'Lido', lendo:'Lendo', 'quero-ler':'Quero ler' };
-
-      var coverHTML = b.cover
-        ? '<img src="' + esc(b.cover) + '" alt="capa" loading="lazy" onerror="this.parentElement.style.background=\'' + pal + '\';this.remove()">'
-        : '<div style="width:100%;height:100%;background:' + pal + ';display:flex;align-items:center;justify-content:center;"><span class="cover-emoji">' + (b.emoji||'📚') + '</span></div>';
-
-      var starsHtml = '';
-      for (var s = 0; s < 5; s++) {
-        starsHtml += '<span class="star ' + (s < (b.rating||0) ? 'lit' : '') + '">' + (s < (b.rating||0) ? '★' : '☆') + '</span>';
-      }
-
-      card.innerHTML =
-        '<div class="book-cover">' + coverHTML + '</div>' +
-        '<div class="book-body">' +
-          '<div class="book-title">' + esc(b.title) + '</div>' +
-          '<div class="book-author">' + esc(b.author||'') + '</div>' +
-          '<div class="book-meta">' +
-            '<div class="stars">' + starsHtml + '</div>' +
-            (b.genre ? '<span class="book-genre">' + esc(b.genre) + '</span>' : '') +
-          '</div>' +
-          '<div class="book-date status-' + b.status + '">' +
-            '<span class="status-dot"></span>' + (statusMap[b.status]||'') + (b.date ? ' · ' + esc(b.date) : '') +
-          '</div>' +
-        '</div>';
-
-      card.addEventListener('click', function() { openDetail(b.id); });
-      grid.appendChild(card);
-    });
+    renderShelf(list);
   }
 
   document.getElementById('stat-lidos').textContent = books.filter(function(b){return b.status==='lido';}).length;
@@ -800,6 +1023,77 @@ function render() {
     genres.map(function(g){ return '<option value="' + esc(g) + '"' + (g===cur?' selected':'') + '>' + esc(g) + '</option>'; }).join('');
 }
 
+// ── BOOKSHELF VIEW ──
+function renderShelf(list) {
+  var container = document.getElementById('bookshelf-container');
+  container.innerHTML = '';
+
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📚</div><h3>Nenhum livro encontrado</h3></div>';
+    return;
+  }
+
+  var SHELF_SIZE = 14;
+  var rows = [];
+  for (var i = 0; i < list.length; i += SHELF_SIZE) rows.push(list.slice(i, i + SHELF_SIZE));
+
+  rows.forEach(function(rowBooks) {
+    var rowEl = document.createElement('div');
+    rowEl.className = 'shelf-row';
+
+    var booksRow = document.createElement('div');
+    booksRow.className = 'shelf-books';
+
+    rowBooks.forEach(function(b, idx) {
+      var globalIdx = books.indexOf(b);
+      var spineColor = SPINE_COLORS[globalIdx % SPINE_COLORS.length];
+
+      // vary height slightly for realism
+      var heights = [145, 155, 165, 150, 160, 140, 170];
+      var h = heights[(globalIdx + idx) % heights.length];
+
+      var bookEl = document.createElement('div');
+      bookEl.className = 'shelf-book';
+
+      var starsStr = '';
+      if (b.rating) {
+        for (var s = 0; s < b.rating; s++) starsStr += '★';
+      }
+
+      var spineContent = '';
+      if (b.cover) {
+        spineContent = '<img src="' + esc(b.cover) + '" alt="' + esc(b.title) + '" onerror="this.parentElement.style.background=\'' + spineColor + '\';this.remove()">';
+      } else {
+        spineContent = '<span class="shelf-book-spine-text">' + esc(b.title) + '</span>';
+        if (starsStr) spineContent += '<span class="shelf-book-spine-star">' + starsStr + '</span>';
+      }
+
+      var statusBorder = b.status === 'lido' ? '#3d7a5a' : b.status === 'lendo' ? '#c9a84c' : 'transparent';
+
+      bookEl.innerHTML =
+        '<div class="shelf-book-spine" style="height:' + h + 'px;background:' + spineColor + ';border-bottom:3px solid ' + statusBorder + ';">' +
+          spineContent +
+        '</div>' +
+        '<div class="shelf-book-title-tooltip">' + esc(b.title) + (b.author ? ' · ' + esc(b.author) : '') + '</div>';
+
+      bookEl.addEventListener('click', function() { openDetail(b.id); });
+      booksRow.appendChild(bookEl);
+    });
+
+    var plank = document.createElement('div');
+    plank.className = 'shelf-plank';
+
+    rowEl.appendChild(booksRow);
+    rowEl.appendChild(plank);
+    container.appendChild(rowEl);
+
+    // gap between shelves
+    var spacer = document.createElement('div');
+    spacer.style.height = '32px';
+    container.appendChild(spacer);
+  });
+}
+
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -808,7 +1102,6 @@ function esc(s) {
 function openModal(id) {
   editingId = id || null;
   var b = id ? books.find(function(x){return x.id===id;}) : null;
-
   document.getElementById('modal-title').innerHTML = id ? 'Editar <span>Livro</span>' : 'Adicionar <span>Livro</span>';
   document.getElementById('f-title').value  = b ? (b.title||'')  : '';
   document.getElementById('f-author').value = b ? (b.author||'') : '';
@@ -818,15 +1111,12 @@ function openModal(id) {
   document.getElementById('f-pages').value  = b ? (b.pages||'')  : '';
   document.getElementById('f-date').value   = b ? (b.date||'')   : '';
   document.getElementById('f-notes').value  = b ? (b.notes||'')  : '';
-
   selectedEmoji   = b ? (b.emoji||'📚')  : '📚';
   selectedRating  = b ? (b.rating||0)    : 0;
   currentCoverUrl = b ? (b.cover||'')    : '';
-
   setCoverPreview(currentCoverUrl, selectedEmoji);
   buildEmojiPicker();
   buildStarPicker();
-
   document.getElementById('modal-overlay').classList.add('open');
   document.getElementById('f-title').focus();
 }
@@ -839,16 +1129,11 @@ function closeModal() {
 async function saveBook() {
   var title = document.getElementById('f-title').value.trim();
   if (!title) { document.getElementById('f-title').focus(); return; }
-
   var btn = document.getElementById('btn-save');
   btn.textContent = 'Salvando...';
   btn.disabled = true;
-
   var cover = document.getElementById('f-cover').value || currentCoverUrl;
-  if (!cover) {
-    cover = await fetchCover(title, document.getElementById('f-author').value.trim()) || '';
-  }
-
+  if (!cover) cover = await fetchCover(title, document.getElementById('f-author').value.trim()) || '';
   var book = {
     id:     editingId || Date.now().toString(36),
     title:  title,
@@ -863,11 +1148,9 @@ async function saveBook() {
     rating: selectedRating,
     cover:  cover,
   };
-
   var result = await db.from('books').upsert(book);
   btn.textContent = 'Salvar';
   btn.disabled = false;
-
   if (result.error) { alert('Erro ao salvar: ' + result.error.message); return; }
   closeModal();
   await loadBooks();
@@ -903,10 +1186,8 @@ function openDetail(id) {
   var b = books.find(function(x){return x.id===id;});
   if (!b) return;
   detailId = id;
-
   var pal = PALETTES[books.indexOf(b) % PALETTES.length];
   var coverEl = document.getElementById('d-cover');
-
   if (b.cover) {
     coverEl.style.background = '';
     coverEl.innerHTML = '<img src="' + esc(b.cover) + '" alt="capa" onerror="this.parentElement.style.background=\'' + pal + '\';this.parentElement.innerHTML=\'<span style=font-size:5rem>' + (b.emoji||'📚') + '</span>\'">';
@@ -914,7 +1195,6 @@ function openDetail(id) {
     coverEl.style.background = pal;
     coverEl.innerHTML = '<span style="font-size:5rem">' + (b.emoji||'📚') + '</span>';
   }
-
   var statusMap = { lido:'✔ Lido', lendo:'📖 Lendo', 'quero-ler':'🔖 Quero ler' };
   document.getElementById('d-title').textContent  = b.title;
   document.getElementById('d-author').textContent = b.author || '—';
@@ -923,17 +1203,12 @@ function openDetail(id) {
   document.getElementById('d-year').textContent   = b.year   || '—';
   document.getElementById('d-pages').textContent  = b.pages  ? b.pages+' págs.' : '—';
   document.getElementById('d-date').textContent   = b.date   || '—';
-
   var starsEl = document.getElementById('d-stars');
   starsEl.innerHTML = '';
-  for (var i=1;i<=5;i++) {
-    starsEl.innerHTML += '<span class="star ' + (i<=(b.rating||0)?'lit':'') + '">★</span>';
-  }
-
+  for (var i=1;i<=5;i++) starsEl.innerHTML += '<span class="star ' + (i<=(b.rating||0)?'lit':'') + '">★</span>';
   var notesEl = document.getElementById('d-notes');
   if (b.notes) { notesEl.style.display='block'; notesEl.textContent=b.notes; }
   else notesEl.style.display='none';
-
   document.getElementById('detail-overlay').classList.add('open');
 }
 
@@ -960,7 +1235,6 @@ function buildStatsCharts() {
   var totalPages = books.reduce(function(s,b){return s+(parseInt(b.pages)||0);},0);
   var rated      = books.filter(function(b){return b.rating>0;});
   var avg        = rated.length ? (rated.reduce(function(s,b){return s+b.rating;},0)/rated.length).toFixed(1) : '—';
-
   document.getElementById('st-total').textContent  = total;
   document.getElementById('st-lidos').textContent  = lidos;
   document.getElementById('st-pages').textContent  = totalPages.toLocaleString('pt-BR');
@@ -971,14 +1245,12 @@ function buildStatsCharts() {
   var genreEntries = Object.entries(genreMap).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
   var gLabels = genreEntries.map(function(e){return e[0];});
   var gData   = genreEntries.map(function(e){return e[1];});
-
   destroyChart('genre');
   if (gLabels.length) {
     statsCharts['genre'] = new Chart(document.getElementById('ch-genre'),{
       type:'doughnut',
       data:{ labels:gLabels, datasets:[{ data:gData, backgroundColor:STAT_COLORS, borderWidth:0, hoverOffset:6 }] },
-      options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
-        plugins:{ legend:{display:false}, tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+ctx.parsed;}}} } }
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{display:false}, tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+ctx.parsed;}}} } }
     });
     buildLegend('ch-genre-legend', gLabels);
   }
@@ -994,8 +1266,7 @@ function buildStatsCharts() {
   statsCharts['status'] = new Chart(document.getElementById('ch-status'),{
     type:'doughnut',
     data:{ labels:sLabels, datasets:[{ data:sData, backgroundColor:sColors, borderWidth:0, hoverOffset:6 }] },
-    options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
-      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+ctx.parsed;}}} } }
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{display:false}, tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+ctx.parsed;}}} } }
   });
   buildLegend('ch-status-legend', sLabels);
 
@@ -1006,19 +1277,12 @@ function buildStatsCharts() {
   var aData    = aEntries.map(function(e){return e[1];});
   var aH = Math.max(180, aLabels.length*38+60);
   document.getElementById('ch-author-wrap').style.height = aH+'px';
-
   destroyChart('author');
   if (aLabels.length) {
     statsCharts['author'] = new Chart(document.getElementById('ch-author'),{
       type:'bar',
       data:{ labels:aLabels, datasets:[{ data:aData, backgroundColor:STAT_COLORS.slice(0,aData.length), borderRadius:4, borderSkipped:false }] },
-      options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{
-          x:{ grid:{color:'rgba(255,255,255,.05)'}, ticks:{color:'#6b5f4a',font:{size:11},stepSize:1} },
-          y:{ grid:{display:false}, ticks:{color:'#e8dfc8',font:{size:11}} }
-        }
-      }
+      options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ grid:{color:'rgba(255,255,255,.05)'}, ticks:{color:'#6b5f4a',font:{size:11},stepSize:1} }, y:{ grid:{display:false}, ticks:{color:'#e8dfc8',font:{size:11}} } } }
     });
   }
 
@@ -1026,33 +1290,47 @@ function buildStatsCharts() {
   destroyChart('rating');
   statsCharts['rating'] = new Chart(document.getElementById('ch-rating'),{
     type:'bar',
-    data:{ labels:['1 ★','2 ★','3 ★','4 ★','5 ★'],
-      datasets:[{ data:rCount, backgroundColor:['#a84040','#cc7a3a','#c9a84c','#3d7a5a','#3d7a5a'], borderRadius:4, borderSkipped:false }] },
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ grid:{display:false}, ticks:{color:'#c9a84c',font:{size:13}} },
-        y:{ grid:{color:'rgba(255,255,255,.05)'}, ticks:{color:'#6b5f4a',font:{size:11},stepSize:1} }
-      }
-    }
+    data:{ labels:['1 ★','2 ★','3 ★','4 ★','5 ★'], datasets:[{ data:rCount, backgroundColor:['#a84040','#cc7a3a','#c9a84c','#3d7a5a','#3d7a5a'], borderRadius:4, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ grid:{display:false}, ticks:{color:'#c9a84c',font:{size:13}} }, y:{ grid:{color:'rgba(255,255,255,.05)'}, ticks:{color:'#6b5f4a',font:{size:11},stepSize:1} } } }
   });
+}
+
+// ── VIEW CONTROLS ──
+function setView(v) {
+  currentView = v;
+  var grid = document.getElementById('books-grid');
+  var shelfContainer = document.getElementById('bookshelf-container');
+
+  document.getElementById('view-grid').classList.remove('active');
+  document.getElementById('view-list').classList.remove('active');
+  document.getElementById('view-shelf').classList.remove('active');
+
+  if (v === 'grid') {
+    grid.style.display = '';
+    grid.style.gridTemplateColumns = '';
+    shelfContainer.classList.remove('active');
+    document.getElementById('view-grid').classList.add('active');
+  } else if (v === 'list') {
+    grid.style.display = '';
+    grid.style.gridTemplateColumns = '1fr';
+    shelfContainer.classList.remove('active');
+    document.getElementById('view-list').classList.add('active');
+  } else if (v === 'shelf') {
+    grid.style.display = 'none';
+    shelfContainer.classList.add('active');
+    document.getElementById('view-shelf').classList.add('active');
+  }
+  render();
 }
 
 // ── EVENTOS ──
 document.getElementById('btn-add').addEventListener('click', function(){ openModal(); });
 document.getElementById('btn-cancel').addEventListener('click', closeModal);
 document.getElementById('btn-save').addEventListener('click', saveBook);
-
-document.getElementById('modal-overlay').addEventListener('click', function(e){
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-});
-document.getElementById('detail-overlay').addEventListener('click', function(e){
-  if (e.target === document.getElementById('detail-overlay')) closeDetail();
-});
+document.getElementById('modal-overlay').addEventListener('click', function(e){ if (e.target === document.getElementById('modal-overlay')) closeModal(); });
+document.getElementById('detail-overlay').addEventListener('click', function(e){ if (e.target === document.getElementById('detail-overlay')) closeDetail(); });
 document.getElementById('detail-close').addEventListener('click', closeDetail);
-document.getElementById('d-edit').addEventListener('click', function(){
-  var id = detailId; closeDetail(); setTimeout(function(){ openModal(id); }, 10);
-});
+document.getElementById('d-edit').addEventListener('click', function(){ var id = detailId; closeDetail(); setTimeout(function(){ openModal(id); }, 10); });
 document.getElementById('d-delete').addEventListener('click', async function(){
   if (!confirm('Remover este livro?')) return;
   var result = await db.from('books').delete().eq('id', detailId);
@@ -1064,35 +1342,17 @@ document.getElementById('search-input').addEventListener('input', render);
 document.getElementById('filter-status').addEventListener('change', render);
 document.getElementById('filter-genre').addEventListener('change', render);
 
-document.getElementById('view-grid').addEventListener('click', function(){
-  document.getElementById('books-grid').style.gridTemplateColumns='';
-  document.getElementById('view-grid').classList.add('active');
-  document.getElementById('view-list').classList.remove('active');
-});
-document.getElementById('view-list').addEventListener('click', function(){
-  document.getElementById('books-grid').style.gridTemplateColumns='1fr';
-  document.getElementById('view-list').classList.add('active');
-  document.getElementById('view-grid').classList.remove('active');
-});
+document.getElementById('view-grid').addEventListener('click', function(){ setView('grid'); });
+document.getElementById('view-list').addEventListener('click', function(){ setView('list'); });
+document.getElementById('view-shelf').addEventListener('click', function(){ setView('shelf'); });
 
 document.getElementById('btn-stats').addEventListener('click', function(){
   document.getElementById('stats-overlay').classList.add('open');
   setTimeout(buildStatsCharts, 50);
 });
-document.getElementById('btn-stats-close').addEventListener('click', function(){
-  document.getElementById('stats-overlay').classList.remove('open');
-});
-document.getElementById('stats-overlay').addEventListener('click', function(e){
-  if (e.target === document.getElementById('stats-overlay'))
-    document.getElementById('stats-overlay').classList.remove('open');
-});
-
-document.addEventListener('keydown', function(e){
-  if (e.key==='Escape') {
-    closeModal(); closeDetail();
-    document.getElementById('stats-overlay').classList.remove('open');
-  }
-});
+document.getElementById('btn-stats-close').addEventListener('click', function(){ document.getElementById('stats-overlay').classList.remove('open'); });
+document.getElementById('stats-overlay').addEventListener('click', function(e){ if (e.target === document.getElementById('stats-overlay')) document.getElementById('stats-overlay').classList.remove('open'); });
+document.addEventListener('keydown', function(e){ if (e.key==='Escape') { closeModal(); closeDetail(); document.getElementById('stats-overlay').classList.remove('open'); } });
 
 // ── OPEN LIBRARY API ──
 var apiDebounce = null;
@@ -1111,7 +1371,6 @@ apiInput.addEventListener('input', function(){
   if (!q) { apiDropdown.style.display='none'; return; }
   apiDropdown.style.display='block';
   apiDropdown.innerHTML='<div style="padding:16px;color:var(--muted);font-family:\'DM Mono\',monospace;font-size:.75rem">Buscando...</div>';
-
   apiDebounce = setTimeout(async function(){
     try {
       var res  = await fetch('https://openlibrary.org/search.json?q=' + encodeURIComponent(q) + '&limit=10');
@@ -1126,7 +1385,6 @@ apiInput.addEventListener('input', function(){
           '<div style="font-size:.85rem;font-style:italic;color:var(--muted);margin-top:2px">' + ((doc.author_name&&doc.author_name[0])||'Autor desconhecido') + (doc.first_publish_year?' · '+doc.first_publish_year:'') + '</div>' +
         '</div>';
       }).join('');
-
       apiDropdown.querySelectorAll('[data-i]').forEach(function(el){
         el.addEventListener('mouseenter',function(){el.style.background='rgba(201,168,76,.06)';});
         el.addEventListener('mouseleave',function(){el.style.background='';});
@@ -1145,10 +1403,7 @@ apiInput.addEventListener('input', function(){
           apiInput.value=''; clearBtn.style.display='none';
           document.getElementById('modal-overlay').classList.add('open');
           document.getElementById('f-title').focus();
-          // busca capa em paralelo
-          fetchCover(doc.title, doc.author_name&&doc.author_name[0]).then(function(url){
-            setCoverPreview(url,'📚');
-          });
+          fetchCover(doc.title, doc.author_name&&doc.author_name[0]).then(function(url){ setCoverPreview(url,'📚'); });
         });
       });
     } catch(err) {
@@ -1157,16 +1412,8 @@ apiInput.addEventListener('input', function(){
   }, 400);
 });
 
-clearBtn.addEventListener('click',function(){
-  apiInput.value=''; clearBtn.style.display='none'; apiDropdown.style.display='none';
-});
-document.addEventListener('mousedown',function(e){
-  if(!apiInput.parentElement.contains(e.target)) apiDropdown.style.display='none';
-});
-
-// ── IMPORTANTE: adicionar coluna 'cover' no Supabase ──
-// Rode no SQL Editor do Supabase:
-// ALTER TABLE books ADD COLUMN IF NOT EXISTS cover TEXT;
+clearBtn.addEventListener('click',function(){ apiInput.value=''; clearBtn.style.display='none'; apiDropdown.style.display='none'; });
+document.addEventListener('mousedown',function(e){ if(!apiInput.parentElement.contains(e.target)) apiDropdown.style.display='none'; });
 
 loadBooks();
 </script>
